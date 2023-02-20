@@ -126,17 +126,27 @@ with mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) a
                 # Render left or right
                 if get_label(num, hand, results):
                     text, coord = get_label(num, hand, results)
-                    cv2.putText(image, text, coord, cv2.FONT_HERSHEY_SIMPLEX,
-                                1, (255, 255, 255), 2, cv2.LINE_AA)
+                    # cv2.putText(image, text, coord, cv2.FONT_HERSHEY_SIMPLEX,
+                    #             1, (255, 255, 255), 2, cv2.LINE_AA)
 
             # Draw finger angles
             draw_finger_angles(image, results, joint_list)
 
-        for angle in angle_list:
-            isFist = isBent(angle)
+            # Check is Fist
+            for angle in angle_list:
+                isFist = isBent(angle)
 
-        if isFist:
-            print("IS fist")
+            # Display is Fist
+            if isFist:
+                text = "Closed Fist"
+            else:
+                text = "Open Hand"
+
+            cv2.putText(image, text, tuple(np.multiply(
+                np.array((hand.landmark[mp_hands.HandLandmark.WRIST].x,
+                        hand.landmark[mp_hands.HandLandmark.WRIST].y)),
+                [640, 480]).astype(int)), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2, cv2.LINE_AA)
+        # print("IS fist")
         # Save Images
         # cv2.imwrite(os.path.join('output_images',
         #             '{}.jpg'.format(uuid.uuid1())), image)

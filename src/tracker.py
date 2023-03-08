@@ -1,14 +1,17 @@
 import mediapipe as mp
 from mediapipe.tasks import python
 import cv2
+import numpy as np
 
 
 class tracker():
 
-    def __init__(self, hands):
+    def __init__(self, hands, joint_list):
         self.hands = hands
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_hands = mp.solutions.hands
+        self.joint_list = joint_list
+        self.angle_list = []
 
     def process(self, ret, frame):
         # BGR - RGB
@@ -23,6 +26,32 @@ class tracker():
         # Detections
         results = self.hands.process(image)
 
-        tracking = results, image
+        self.draw_finger_angles(results, self.joint_list)
+
+        tracking = results, self.angle_list, image
 
         return tracking
+
+    def draw_finger_angles(self, results, joint_list):
+
+        self.angle_list = []
+        # Loop through hands
+        if results.multi_hand_landmarks:
+            for hand in results.multi_hand_landmarks:
+                # Loop through joint sets
+                for joint in joint_list:
+                    # First Coord
+                    a = np.array([hand.landmark[joint[0]].x,
+                                  hand.landmark[joint[0]].y])
+                    # Second Coord
+                    b = np.array([hand.landmark[joint[1]].x,
+                                  hand.landmark[joint[1]].y])
+                    # Third Coord
+                    c = np.array([hand.landmark[joint[2]].x,
+                                  hand.landmark[joint[2]].y])
+
+                    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - \
+                        np.arctan2(a[1] - b[1], a[0] - b[0])
+                    angle = np.abs(radians*180.0/np.pi)\
+
+                    self.angle_list.append([b, angle])

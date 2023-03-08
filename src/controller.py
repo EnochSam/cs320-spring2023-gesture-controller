@@ -10,10 +10,20 @@ from mediapipe.tasks.python import vision
 
 import tracker
 import display
+import gesture_recognizer
 
 # Set up drawing capeabilities
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
+
+# Joint List
+THUMB = [3, 4, 5]
+INDEX = [7, 6, 5]
+MIDDLE = [9, 10, 11]
+RING = [15, 14, 13]
+PINKY = [19, 18, 17]
+joint_list = [INDEX, MIDDLE, RING, PINKY]
+angle_list = []
 
 
 def isBent(angle):
@@ -25,14 +35,18 @@ cap = cv2.VideoCapture(0)
 
 with mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) as hands:
 
-    tracker = tracker.tracker(hands)
+    tracker = tracker.tracker(hands, joint_list)
+    recognizer = gesture_recognizer.recognizer()
     display = display.display()
 
     while cap.isOpened():
         ret, frame = cap.read()
 
-        results, image = tracker.process(ret, frame)
+        # Find hand landmarks
+        results, angle_list, image = tracker.process(ret, frame)
 
+        # Recognize Gesture
+        gesture = recognizer.recognize(angle_list)
         # Set flag to true
         image.flags.writeable = True
 
@@ -41,7 +55,8 @@ with mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) a
 
         # Render results
         # Gesture placeholder -- replace with detected gesture
-        image = display.render(results, image, "Is fist")
+        image = display.render(
+            results, image, angle_list, gesture)
 
         cv2.imshow('Hand Tracking', image)
 

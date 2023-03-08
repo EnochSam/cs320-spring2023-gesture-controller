@@ -5,25 +5,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-# Joint List
-THUMB = [3, 4, 5]
-INDEX = [7, 6, 5]
-MIDDLE = [9, 10, 11]
-RING = [15, 14, 13]
-PINKY = [19, 18, 17]
-joint_list = [INDEX, MIDDLE, RING, PINKY]
-angle_list = []
-
-
 class display():
     def __init__(self):
         # Set up drawing capeabilities
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_hands = mp.solutions.hands
-        self.joint_list = joint_list
-        self.angle_list = angle_list
 
-    def render(self, results, image, gesture):
+    def render(self, results, image, angle_list, gesture):
         # Render results
         if results.multi_hand_landmarks:
             for num, hand in enumerate(results.multi_hand_landmarks):
@@ -41,7 +29,7 @@ class display():
                     # cv2.putText(image, text, coord, cv2.FONT_HERSHEY_SIMPLEX,
                     #             1, (255, 255, 255), 2, cv2.LINE_AA)
             # Draw finger angles
-            self.draw_finger_angles(image, results, self.joint_list)
+            self.draw_finger_angles(image, angle_list)
 
             # print("IS fist")
             # Save Images
@@ -74,35 +62,11 @@ class display():
 
                 return output
 
-    def draw_finger_angles(self, image, results, joint_list):
-
-        # Loop through hands
-        for hand in results.multi_hand_landmarks:
-            # Loop through joint sets
-            for joint in joint_list:
-                # First Coord
-                a = np.array([hand.landmark[joint[0]].x,
-                              hand.landmark[joint[0]].y])
-                # Second Coord
-                b = np.array([hand.landmark[joint[1]].x,
-                              hand.landmark[joint[1]].y])
-                # Third Coord
-                c = np.array([hand.landmark[joint[2]].x,
-                              hand.landmark[joint[2]].y])
-
-                radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - \
-                    np.arctan2(a[1] - b[1], a[0] - b[0])
-                angle = np.abs(radians*180.0/np.pi)\
-
-                if angle > 180.0:
-                    angle = 360-angle
-
-                cv2.putText(image, str(round(angle, 2)), tuple(np.multiply(b, [640, 480]).astype(
-                    int)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-
-                # if isBent(angle):
-                #     print("joint {} is bent".format(joint))
-
-                self.angle_list.append(angle)
+    def draw_finger_angles(self, image, angle_list):
+        angle = 1
+        location = 0
+        for joint in angle_list:
+            cv2.putText(image, str(round(joint[angle], 2)), tuple(np.multiply(joint[location], [640, 480]).astype(
+                int)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
 
         return image

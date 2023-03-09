@@ -40,7 +40,9 @@ class display():
                 np.array((hand.landmark[self.mp_hands.HandLandmark.WRIST].x,
                           hand.landmark[self.mp_hands.HandLandmark.WRIST].y)),
                 [640, 480]).astype(int)), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2, cv2.LINE_AA)
-        return image
+
+        # Display image
+        cv2.imshow('Hand Tracking', image)
 
     def get_label(self, index, hand, results):
         output = None

@@ -1,5 +1,5 @@
 class recognizer:
-    def recognize(self, joint_angles):
+    def getGesture(self, joint_angles):
         isFist = True
         angle = 1
         for joint in joint_angles:

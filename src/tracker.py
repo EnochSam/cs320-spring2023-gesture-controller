@@ -3,6 +3,9 @@ from mediapipe.tasks import python
 import cv2
 import numpy as np
 
+# Constants
+location_marker = 0
+
 
 class tracker():
 
@@ -55,3 +58,13 @@ class tracker():
                     angle = np.abs(radians*180.0/np.pi)\
 
                     self.angle_list.append([b, angle])
+
+    def getLocation(self, results):
+        if results.multi_hand_landmarks:
+            location = []
+            for hand in results.multi_hand_landmarks:
+                location.append([hand.landmark[location_marker].x,
+                                 hand.landmark[location_marker].y])
+        else:
+            location = "None"
+        return location

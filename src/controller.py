@@ -19,12 +19,14 @@ joint_list = [INDEX, MIDDLE, RING, PINKY]
 
 class controller:
 
-    def __init__(self, camera, isDisplay):
+    def __init__(self, camera, isDisplay, screen_size):
         # Set up LiveStream
         self.isDisplay = isDisplay
-        self.cap = cv2.VideoCapture(camera)
         self.tracker = __import__("tracker")
         self.display = __import__("display")
+        self.screen_size = screen_size
+
+        self.cap = cv2.VideoCapture(camera)
 
         self.hands = mp_hands.Hands(min_detection_confidence=0.8,
                                     min_tracking_confidence=0.5)
@@ -43,7 +45,7 @@ class controller:
             results, angle_list, image = tracker.process(ret, frame)
 
             # Find palm position
-            location = tracker.getLocation(results)
+            location = tracker.getLocation(results, self.screen_size)
             # Recognize Gesture
             gesture = recognizer.getGesture(angle_list)
             # Set flag to true
@@ -53,10 +55,10 @@ class controller:
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
             # Render results
-            # Gesture placeholder -- replace with detected gesture
             if self.isDisplay:
-                display.render(
-                    results, image, angle_list, gesture)
+                image = display.render(
+                    results, image, angle_list, recognizer.gestures[gesture])
+                cv2.imshow('Hand Tracking', image)
 
         input = location, gesture
 

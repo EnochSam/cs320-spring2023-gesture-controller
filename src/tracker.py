@@ -59,12 +59,14 @@ class tracker():
 
                     self.angle_list.append([b, angle])
 
-    def getLocation(self, results):
+    def getLocation(self, results, screen_size):
         if results.multi_hand_landmarks:
             location = []
             for hand in results.multi_hand_landmarks:
-                location.append([hand.landmark[location_marker].x,
-                                 hand.landmark[location_marker].y])
+                location.append(tuple(np.multiply(
+                    np.array((hand.landmark[location_marker].x,
+                              hand.landmark[location_marker].y)),
+                    screen_size).astype(int)))
         else:
             location = "None"
         return location

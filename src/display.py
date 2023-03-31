@@ -42,7 +42,7 @@ class display():
                 [640, 480]).astype(int)), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2, cv2.LINE_AA)
 
         # Display image
-        cv2.imshow('Hand Tracking', image)
+        return image
 
     def get_label(self, index, hand, results):
         output = None

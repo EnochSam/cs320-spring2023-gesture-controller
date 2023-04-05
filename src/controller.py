@@ -60,7 +60,7 @@ class controller:
                     results, image, angle_list, recognizer.gestures[gesture])
                 cv2.imshow('Hand Tracking', image)
 
-        input = location, gesture
+        input = location, gesture, image, recognizer.count(angle_list)
 
         return input
 

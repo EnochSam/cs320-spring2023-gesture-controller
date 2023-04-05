@@ -59,6 +59,10 @@ pygame.display.set_icon(icon)
 controller = controller.controller(CAMERA, DISPLAY, SCREEN_SIZE)
 quit = False
 
+WELCOME_MESSAGE = "Canadian Invasion!!!"
+CENTERX = 370
+CENTERY = 350
+
 # Create Window
 screen = pygame.display.set_mode(SCREEN_SIZE)
 
@@ -72,12 +76,12 @@ enemyIMG = pygame.image.load(PATH + 'enemy_tank.png')
 # Load Text
 
 
-def renderScore(score):
+def renderScore(text, scoreX, scoreY, background, foreground):
     font = pygame.font.Font(FONT, FONT_SIZE)
-    score_text = font.render(SCORE + str(score), True, WHITE, BLACK)
+    score_text = font.render(text, True, foreground, background)
     score_rect = score_text.get_rect()
 
-    score_rect.center = (SCOREX, SCOREY)
+    score_rect.center = (scoreX, scoreY)
 
     text = score_text, score_rect
 
@@ -303,6 +307,36 @@ class enemy_spawner:
             self.spawnEnemy()
             self.lastSpawn = getTime()
 
+
+startGame = False
+currentCount = 3
+# Welcome Screen
+
+while startGame == False:
+    screen.blit(background, (0, 0))
+
+    welcome, welcome_rect = renderScore(
+        WELCOME_MESSAGE, CENTERX, CENTERY, BLACK, WHITE)
+    screen.blit(welcome, welcome_rect)
+
+    prepare, prepare_rect = renderScore(
+        "Prepare for Assault in : " + str(currentCount), CENTERX, CENTERY + 80, BLACK, WHITE)
+    screen.blit(prepare, prepare_rect)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            break
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                break
+
+    location, gesture, frame, count = controller.process()
+    if (location != "None"):
+        if (currentCount == 0):
+            break
+        elif (count == currentCount):
+            currentCount -= 1
+    pygame.display.update()
 # Initialize Lists
 
 
@@ -330,7 +364,8 @@ def check_move_direction(location):
 def display(objects):
     screen.blit(background, (0, 0))
 
-    score, score_rect = renderScore(player.score)
+    score, score_rect = renderScore(
+        SCORE + str(player.score), SCOREX, SCOREY, BLACK, WHITE)
     screen.blit(score, score_rect)
     for list in objects:
         for object in list:
@@ -383,6 +418,7 @@ def check_defeat():
 
 # Mainloop for Game
 while quit == False:
+
     bullets = []
     for player in players:
         for bullet in player.bullets:
@@ -400,7 +436,7 @@ while quit == False:
             if event.key == pygame.K_q:
                 quit()
 
-    location, gesture = controller.process()
+    location, gesture, frame, count = controller.process()
 
     # Handle player input
     handle_input(location, gesture)
@@ -412,6 +448,27 @@ while quit == False:
     pygame.display.update()
 
 print(player.score)
+
+
+while True:
+    failed, failed_rect = renderScore(
+        "You Failed!!", CENTERX, CENTERY, BLACK, RED)
+
+    screen.blit(failed, failed_rect)
+
+    finalScore, finalScore_Rect = renderScore(
+        "Your final score was: " + str(player.score), CENTERX, CENTERY + 80, BLACK, RED)
+
+    screen.blit(finalScore, finalScore_Rect)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            quit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                quit()
+
+    pygame.display.update()
 
 
 def quit():

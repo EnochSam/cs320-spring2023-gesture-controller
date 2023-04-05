@@ -10,13 +10,13 @@ def getTime():
 
 
 def elapsed_time(initial):
-    return time.perf_counter() - initial
+    return (getTime() - initial)
 
 
 class recognizer:
     def __init__(self) -> None:
         self.gestures = [FIST, HAND]
-        self.Cooldown = 5
+        self.called = False
         self.lastCall = getTime()
 
     def getGesture(self, joint_angles):
@@ -29,12 +29,22 @@ class recognizer:
             gesture = self.getIndex(FIST)
         elif self.testGesture(joint_angles):
             gesture = self.getIndex(HAND)
-            if (elapsed_time(self.lastCall) >= self.Cooldown):
-                webbrowser.open("https://www.youtube.com/watch?v=iQwTTRLuEyU")
+            # if (self.called) == False:
+            #     webbrowser.open("https://www.youtube.com/watch?v=iQwTTRLuEyU")
+            #     self.called = True
         else:
             gesture = self.getIndex(HAND)
 
         return gesture
+
+    def count(self, joint_angles):
+        bentAngles = 0
+
+        for joint in joint_angles:
+            if self.isBent(joint[1]):
+                bentAngles += 1
+
+        return bentAngles
 
     def getIndex(self, gesture):
         index = 0

@@ -25,6 +25,7 @@ class controller:
         self.tracker = __import__("tracker")
         self.display = __import__("display")
         self.screen_size = screen_size
+        self.recognizer = gesture_recognizer.recognizer()
 
         self.cap = cv2.VideoCapture(camera)
 
@@ -35,7 +36,7 @@ class controller:
         # with mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) as hands:
 
         tracker = self.tracker.tracker(self.hands, joint_list)
-        recognizer = gesture_recognizer.recognizer()
+        recognizer = self.recognizer
         display = self.display.display()
 
         if self.cap.isOpened():
@@ -60,7 +61,7 @@ class controller:
                     results, image, angle_list, recognizer.gestures[gesture])
                 cv2.imshow('Hand Tracking', image)
 
-        input = location, gesture, image, recognizer.count(angle_list)
+        input = location, gesture, recognizer.count(angle_list)
 
         return input
 

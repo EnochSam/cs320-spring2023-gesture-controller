@@ -51,6 +51,9 @@ FONT = 'freesansbold.ttf'
 FONT_SIZE = 32
 SCORE = "Score: "
 
+# Window Constants
+IMAGEX = 100
+IMAGEY = 50
 # Initialize
 pygame.init()
 pygame.display.set_caption("Canadian Invasion")
@@ -98,6 +101,15 @@ def getTime():
 
 def elapsed_time(initial):
     return time.perf_counter() - initial
+
+
+def convert_image(image):
+    frame = pygame.image.frombuffer(
+        image.tostring(), image.shape[1::-1], "BGR")
+
+    scaled_frame = pygame.transform.scale(frame, (10, 10))
+
+    return scaled_frame
 
 # Player
 
@@ -330,7 +342,12 @@ while startGame == False:
             if event.key == pygame.K_q:
                 break
 
-    location, gesture, frame, count = controller.process()
+    location, gesture, count = controller.process()
+
+    # screen.blit(background, (0, 0))
+    # frame = convert_image(image)
+
+    # screen.blit(frame, (IMAGEX, IMAGEY))
     if (location != "None"):
         if (currentCount == 0):
             break
@@ -363,7 +380,9 @@ def check_move_direction(location):
 
 def display(objects):
     screen.blit(background, (0, 0))
+    # frame = convert_image(image)
 
+    # screen.blit(frame, (IMAGEX, IMAGEY))
     score, score_rect = renderScore(
         SCORE + str(player.score), SCOREX, SCOREY, BLACK, WHITE)
     screen.blit(score, score_rect)
@@ -436,7 +455,7 @@ while quit == False:
             if event.key == pygame.K_q:
                 quit()
 
-    location, gesture, frame, count = controller.process()
+    location, gesture, count = controller.process()
 
     # Handle player input
     handle_input(location, gesture)
@@ -450,7 +469,14 @@ while quit == False:
 print(player.score)
 
 
-while True:
+def quit():
+    quit = True
+
+# Exit Screen
+
+
+quit = False
+while quit == False:
     failed, failed_rect = renderScore(
         "You Failed!!", CENTERX, CENTERY, BLACK, RED)
 
@@ -461,6 +487,10 @@ while True:
 
     screen.blit(finalScore, finalScore_Rect)
 
+    location, gesture, count = controller.process()
+    if location != "None":
+        if gesture == 3:
+            quit()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             quit()
@@ -469,7 +499,3 @@ while True:
                 quit()
 
     pygame.display.update()
-
-
-def quit():
-    quit = True

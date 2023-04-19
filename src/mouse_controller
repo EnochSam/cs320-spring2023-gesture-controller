@@ -1,0 +1,18 @@
+import mouse
+import controller
+
+# Constants
+RESOLUTION = (1910, 1080)
+controller = controller.controller(0, False, RESOLUTION)
+
+while True:
+    location, gesture,  count = controller.process()
+
+    if (location != "None"):
+        mouse.move(location[0][0], location[0][1], True, 0)
+        if gesture == 0:
+            mouse.click('left')
+        elif gesture == 2:
+            mouse.click('right')
+        elif (gesture == 3):
+            break

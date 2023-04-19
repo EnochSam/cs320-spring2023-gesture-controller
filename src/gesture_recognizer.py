@@ -3,6 +3,8 @@ import time
 # Gestures
 FIST = "Closed Fist"
 HAND = "Open Hand"
+POINT = "Pointing Upward"
+HORN = "Horns"
 
 
 def getTime():
@@ -15,8 +17,8 @@ def elapsed_time(initial):
 
 class recognizer:
     def __init__(self) -> None:
-        self.gestures = [FIST, HAND]
-        self.called = False
+        self.gestures = [FIST, HAND, POINT, HORN]
+        self.callable = True
         self.lastCall = getTime()
 
     def getGesture(self, joint_angles):
@@ -27,11 +29,14 @@ class recognizer:
                 isFist = False
         if isFist:
             gesture = self.getIndex(FIST)
-        elif self.testGesture(joint_angles):
-            gesture = self.getIndex(HAND)
-            # if (self.called) == False:
-            #     webbrowser.open("https://www.youtube.com/watch?v=iQwTTRLuEyU")
-            #     self.called = True
+
+        elif self.horns(joint_angles):
+            gesture = self.getIndex(HORN)
+
+        elif self.point(joint_angles) and self.callable:
+            gesture = self.getIndex(HORN)
+            webbrowser.open("https://www.youtube.com/watch?v=iQwTTRLuEyU")
+            self.callable = False
         else:
             gesture = self.getIndex(HAND)
 
@@ -55,8 +60,11 @@ class recognizer:
                 index += 1
         return index
 
-    def testGesture(self, angle_list):
+    def point(self, angle_list):
         return (angle_list[0][1] >= 90 and angle_list[1][1] < 90 and angle_list[2][1] < 90 and angle_list[3][1] < 90)
+
+    def horns(self, angle_list):
+        return (angle_list[0][1] >= 90 and angle_list[1][1] < 90 and angle_list[2][1] < 90 and angle_list[3][1] >= 90)
 
     def isBent(self, angle):
         return angle < 90
